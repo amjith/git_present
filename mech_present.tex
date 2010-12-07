@@ -1,0 +1,593 @@
+\documentclass[10pt]{beamer}
+\usepackage{amsmath}
+\mode<presentation>
+    {
+      \usetheme{Warsaw}
+      % \usetheme{default}
+      % or ...
+
+      \setbeamercovered{transparent}
+      % or whatever (possibly just delete it)
+    }
+
+    \newcommand{\ls}[1]
+               {\dimen0=\fontdimen6\the\font
+                 \lineskip=#1\dimen0
+                 \advance\lineskip.5\fontdimen5\the\font
+                 \advance\lineskip-\dimen0
+                 \lineskiplimit=.9\lineskip
+                 \baselineskip=\lineskip
+                 \advance\baselineskip\dimen0
+                 \normallineskip\lineskip
+                 \normallineskiplimit\lineskiplimit
+                 \normalbaselineskip\baselineskip
+                 \ignorespaces
+               }
+
+\title{Framework for Automated Code Verification using Method of Manufactured Solutions}
+\author{Amjidanutpan Ramanujam}
+\institute{M.E. Project Defense\\
+Department of Mechanical Engineering\\
+University of Utah}
+\date{}
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}
+\frametitle{Outline}
+\begin{itemize}
+ \item Motivation
+ \item Introduction
+ \item Verification Tests
+ \item Method of Manufactured Solutions
+ \item Automated Verification Framework
+ \item Experiments
+ \item Results and Analysis
+ \item Future Work and Conclusion
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+ \frametitle{Motivation}
+Numerical Verification ....
+ \begin{itemize}
+  \item IMPORTANT
+  \item Identify bugs/issues
+  \item Challenging
+  \item Tedious
+  \item It must be repeated several times
+ \end{itemize}
+
+
+\begin{block}{Solution}
+\begin {itemize}
+ \item Pick a tested method of verification
+ \item Automate the verification using the chosen method
+\end {itemize}
+\end{block}
+\end{frame}
+
+ 
+\begin{frame}
+    \frametitle{Introduction}
+    \begin{itemize}
+        \item Verification
+            \begin{itemize}
+                \item Are we solving the governing equations, \textbf{correctly}?
+                \item Order-of-Accuracy
+            \end{itemize}
+        \item Discretization Error
+            \begin{itemize}
+                \item Exact Solution - Mathematical Equations
+                \item Approximate Solution - Discretized Equations
+                \item Floating Point Error
+            \end{itemize}
+        \item Why is it important?
+        \item Validation $\ne$ Verification
+            \begin{itemize}
+                \item Are we solving the correct \textbf{governing equations}?
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{Verification tests}
+    \begin{itemize}
+        \item Sanity Checks
+        \item Symmetry Tests
+        \item Comparison with other computer codes
+        \item Method of Exact Solutions (MES)
+        \item Method of Manufactured Solutions (MMS)
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{\begin{minipage}{2.2in}Verification\end{minipage} \begin{minipage}{2.5in}\begin{flushright}Background\end{flushright}\end{minipage}}
+        \begin{block}{Governing Equation}
+            $$Du = g$$
+        \end{block}
+\begin{center}
+$
+D - \mbox{Differential Operator}\ \ \  
+u - \mbox{Solution} \ \ \ 
+g - \mbox{Forcing function} 
+$
+\end{center}
+\begin{itemize}
+ \item Compute the solution \textbf{analytically}, {\Large $u_a$}
+ \item Compute the solution \textbf{numerically}, {\Large $u_n$}
+\end{itemize}
+
+\begin{block}{Discretization Error}
+Absolute difference between exact and approximation solutions
+\begin{center}
+{\large $u_a \thicksim u_n$}\end{center}
+\end{block} \pause
+\begin{center}
+\fbox{\large How to find $u_a$?}
+\end{center}
+\end{frame}
+
+
+\begin{frame}
+ \frametitle{\begin{minipage}{2.2in}Verification\end{minipage} \begin{minipage}{2.5in}\begin{flushright}Background\end{flushright}\end{minipage}}
+\begin{block}{Method of Exact Solutions}
+$$Du = g$$
+
+\begin{itemize}
+ \item Invert $D$ to find $u_a$
+\[u_a = D^{-1}g\]
+\end{itemize}
+\end{block}
+\pause
+\begin{alertblock}{Limitations}
+ \begin{itemize}
+  \item Hard/Impossible to invert non-linear operators
+  \item Inverted operators (involving Laplace transforms) are hard to implement
+  \item Exact solutions are not always possible eg: Navier-Stokes equations
+ \end{itemize}
+
+\end{alertblock}
+
+\end{frame}
+
+\begin{frame}
+ \frametitle{\begin{minipage}{2.2in}Verification\end{minipage} \begin{minipage}{2.5in}\begin{flushright}Background\end{flushright}\end{minipage}}
+\begin{block}{Method of Manufactured Solutions}
+ \[Du=g\]
+\begin{itemize}
+ \item Design a $\mathbf{u_{m}}$ and apply $\mathbf{D}$ to compute $\mathbf{g_m}$
+ \item New problem designed $\mathbf{Du_m=g_m}$
+ %\item Exact solution ($u_m$) and forcing functions ($g_m$) available
+ \item Solve the new problem numerically - $\mathbf{u_n}$
+ \item Discretization error = $\mathbf{u_m - u_n}$
+\end{itemize}
+
+\end{block}
+\pause
+\begin{exampleblock}{Advantages}
+ \begin{itemize}
+  \item Exact solutions are possible and relatively easy
+  \item Easy to implement simple functions eg: trigonometric, exponential, polynomial etc.
+ \end{itemize}
+\end{exampleblock}
+
+\end{frame}
+
+
+
+\begin{frame}
+ \frametitle{Verification Tree}
+\begin{center}
+\includegraphics[bb=1.5in 1in 16.0in 11in, scale=0.25]{pics/design.png}
+\end{center}
+\end{frame}
+
+\begin{frame}
+ \frametitle{Verification Framework}
+\begin{block}{Goals}
+\begin{itemize}
+ \item Easy to manage a large number of tests
+ \begin{itemize}
+	\item Add/Remove tests
+	\item Disable/Enable tests
+ \end{itemize}
+ \item Auto-generate input files based on specifications
+ \item Analyze the results and plot the error and order of accuracy
+ \item Compare with baseline results
+ \item Notify the user when the results are available
+ \end{itemize}
+\end{block}
+\end{frame}
+
+
+
+\begin{frame}
+ \frametitle{\begin{minipage}{2.2in}Verification Framework\end{minipage} \begin{minipage}{2.5in}\begin{flushright}Design \& Implementation\end{flushright}\end{minipage}}
+\begin{itemize}
+ \item Organization and Control
+	\begin{itemize}
+	 \item Hierarchy of tests
+ 	 \item XML files to control the flow
+	\end{itemize}
+ \item Run the tests
+	\begin{itemize}
+	 \item Base input file
+	 \item Test description file (XML formatted .tst)
+	\end{itemize}
+ \item Analyze the results
+	\begin{itemize}
+	 \item Comparison program
+	 \item Auto-generated input file
+	 \item Generates plots of error and order
+ 	 \item Baseline directory for comparison
+	\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+ \frametitle{\begin{minipage}{1.5in}Experiments\end{minipage}  \begin{minipage}{3.2in}\begin{flushright}Advect and Advance in Time (ICE)\end{flushright}\end{minipage}}
+\begin{itemize}
+ \item ICE (Implicit, Continuous, Eulerian) Solver
+\begin{itemize}
+\item Cell-centered, finite-volume, multi-material CFD algorithm
+\end{itemize}
+\item Advect and Advance in Time (AAT) - Transport module
+\begin{itemize}
+\item Material derivative of physical quantity
+\item Crucial part of the ICE algorithm
+\item $1^{st}$ order in time (ideal)
+\item $2^{nd}$ order in space (ideal)
+\end{itemize}
+\end{itemize}
+\begin{block}{Governing Equation}
+$$\dfrac{\partial}{\partial t}\left (\rho f \right ) + \dfrac{\partial}{\partial x}\left (\rho f U_x\right ) + \dfrac{\partial}{\partial y}\left (\rho f U_y\right ) + \dfrac{\partial}{\partial z}\left (\rho f U_z\right ) = 0$$
+\end{block}
+$f$ - Passive Scalar \ \ \ \ $U$ - Constant Velocity  \ \ \ \ \ $\rho$ - density
+\end{frame}
+
+\begin{frame}
+ \frametitle{\begin{minipage}{2.2in}Experiments\end{minipage}  \begin{minipage}{2.5in}\begin{flushright}Passive Scalar\end{flushright}\end{minipage}}
+\begin{itemize}
+\item Advection of passive scalar at 10m/s
+\item First order and Second order tests
+\end{itemize}
+\vspace{-0.1in}
+\begin{block}{One Dimensional Experiment}
+	\begin{itemize}
+	\item Computational grid size 
+		\begin{itemize}
+		\item -0.5m to 0.5m in the respective directions
+		\end{itemize}
+	\item Spatial Resolutions 100, 200, 300, 400, 500, 600, 700, 800 cells
+% 		\begin{itemize}
+% 		\item $\Delta x= 1\times10^{-2}, 5\times10^{-3}, 3.33\times10^{03}, 2.5\times10^{-3}, 2\times10^{-3}, 1.66\times10^{-3}, 2.5\times10^{-3}, 1.42857\times10^{-3}, 1.25\times10^{-3}$
+% 		\end{itemize}
+	\end{itemize}
+\end{block}
+\pause
+\begin{block}{Temporal Attributes}
+	\begin{itemize} 
+		\item 100 timesteps
+		\item Temporal step-size $10^{-6}s$
+		\begin{itemize}
+		\item O($\Delta x^2$) $\ge$ O($\Delta t$)
+		\end{itemize}
+	\end{itemize}
+\end{block}
+\begin{itemize}
+ \item Initial passive scalar profiles -- Exponential, Triangular, 2-d Exponential
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+ \frametitle{\begin{minipage}{2.2in}Experiments\end{minipage}  \begin{minipage}{2.5in}\begin{flushright}Metrics\end{flushright}\end{minipage}}
+\begin{block}{Discretization Error}
+% Two metrics for quantifying discretization error:
+ \begin{itemize}
+  \item Normalized L-2 norm
+\begin{center}
+ $L_2 =  \sqrt{\dfrac{1}{N}\displaystyle\sum_{n=1} ^N \mid e_n-E_n \mid^2}$
+\end{center}
+% \item L-$\infty$ norm
+% \begin{center}
+%  $L_{\infty}=\max \mid e_n-E_n \mid$
+% \end{center}
+ \end{itemize}
+
+\end{block}
+\begin{center}
+ $e_n$ - Exact Solution \ \ $E_n$ - Simulation Results \ \  $N$ - Number of cells
+\end{center}
+\pause
+\begin{block}{Order-of-Accuracy ($p$)}
+\begin{itemize}
+ \item Order-of-accuracy at a point
+\begin{center}
+ $p=\dfrac{\log \left (\dfrac{L_{2\_Grid1}}{L_{2\_Grid2}}\right)}{\log (r)}$
+\end{center}
+\item Global order-of-accuracy
+\begin{center}
+ $Error = a\times(h)^b$
+\end{center}
+\end{itemize}
+\end{block}
+\begin{center}
+ $r$ - refinement ratio \ \ $a$ - constant \ \ $b$ - order-of-accuracy \ \ $h$ - step-size
+\end{center}
+\end{frame}
+
+\begin{frame}
+ \frametitle{\begin{minipage}{2.2in}Experiments\end{minipage}  \begin{minipage}{2.5in}\begin{flushright}1-D Exponential Profile\end{flushright}\end{minipage}}
+\begin{itemize}
+ \item 1-D advection of a passive scalar at a constant velocity
+%  \item Profile: Exponential
+\end{itemize}
+\begin{equation*}
+f(x) = 20\times \exp{\left(\frac{-1.0}{d(1-d)}\right)}
+\end{equation*}
+\[{\textstyle \mbox{\small d} = \left(\frac{x + 0.5}{1.0}\right)}\]
+\vspace{-0.2in}
+\begin{center}
+\includegraphics[width=90mm]{pics/include_exp1.pdf}
+\end{center}
+\end{frame}
+
+\begin{frame}
+ \frametitle{\begin{minipage}{2.2in}Experiments\end{minipage}  \begin{minipage}{2.5in}\begin{flushright}Results\end{flushright}\end{minipage}}
+\vspace{-0.1in}
+\begin{minipage}{2in}
+First Order Advection Routine
+\end{minipage} 
+\begin{minipage}{2in}
+\includegraphics[width=60mm]{pics/1d_exp_fo.pdf}
+\end{minipage}
+\vspace{-0.2in}
+\begin{minipage}{2in}
+Second Order Advection Routine 
+\end{minipage}
+\begin{minipage}{2in}
+\includegraphics[width=60mm]{pics/1d_exp_so.pdf}
+\end{minipage}
+
+\end{frame}
+
+
+\begin{frame}
+ \frametitle{\begin{minipage}{2.2in}Experiments\end{minipage}  \begin{minipage}{2.5in}\begin{flushright}Triangular Profile\end{flushright}\end{minipage}} 
+\begin{itemize}
+ \item 1-D advection of a triangular profile at a constant velocity (10m/s)
+%  \item Profile: Exponential
+\end{itemize}
+\begin{equation*}
+f(x) = \left\{
+\begin{array}{l l}
+ slope \times d & \quad d<=0.5\\
+ slope \times(1.0 - d) & \quad d>0.5
+\end{array} \right .
+\end{equation*}
+\[{\textstyle \mbox{\small d} = \left(\frac{x + 0.5}{1.0}\right)}\]
+\vspace{-0.2in}
+\begin{center}
+\includegraphics[width=90mm]{pics/include_tri.pdf}
+\end{center}
+\end{frame}
+
+\begin{frame}
+ \frametitle{\begin{minipage}{2.2in}Experiments\end{minipage}  \begin{minipage}{2.5in}\begin{flushright}Results\end{flushright}\end{minipage}}
+\vspace{-0.1in}
+\begin{minipage}{2in}
+First Order Advection Routine
+\end{minipage} 
+\begin{minipage}{2in}
+\includegraphics[width=60mm]{pics/1d_tri_fo.pdf}
+\end{minipage}
+\vspace{-0.2in}
+\begin{minipage}{2in}
+Second Order Advection Routine
+\end{minipage}
+\begin{minipage}{2in}
+\includegraphics[width=60mm]{pics/1d_tri_so.pdf}
+\end{minipage}
+
+\end{frame}
+
+\begin{frame}
+ \frametitle{\begin{minipage}{2.2in}Experiments\end{minipage}  \begin{minipage}{2.5in}\begin{flushright} 2-D Exponential Profile\end{flushright}\end{minipage}}
+\begin{itemize}
+ \item 1-D advection of a passive scalar at a constant velocity
+%  \item Profile: Exponential
+\end{itemize}
+\begin{equation*}
+f(x) = 20\times \exp{\left(\frac{-1.0}{d1(1-d_1)}\right)} \times \exp{\left(\frac{-1.0}{d_2(1-d_2)}\right)}
+\end{equation*}
+\[{\textstyle \mbox{\small $d_1$} = \left(\frac{x + 0.3}{0.6}\right) \ \ \ \ \mbox{\small $d_2$} = \left(\frac{y + 0.3}{0.6}\right)}\]
+\vspace{-0.15in}
+\begin{center}
+\includegraphics[width=90mm]{pics/include_exp2.pdf}
+\end{center}
+\end{frame}
+
+\begin{frame}
+ \frametitle{\begin{minipage}{2.2in}Experiments\end{minipage}  \begin{minipage}{2.5in}\begin{flushright}Results\end{flushright}\end{minipage}}
+\vspace{-0.1in}
+\begin{minipage}{2in}
+First Order Advection Routine
+\end{minipage} 
+\begin{minipage}{2in}
+\includegraphics[width=60mm]{pics/2d_exp_fo.pdf}
+\end{minipage}
+\vspace{-0.2in}
+\begin{minipage}{2in}
+Second Order Advection Routine 
+\end{minipage}
+\begin{minipage}{2in}
+\includegraphics[width=60mm]{pics/2d_exp_so.pdf}
+\end{minipage}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{\begin{minipage}{2.2in}Experiments\end{minipage}  \begin{minipage}{2.5in}\begin{flushright}Temporal Resolution\end{flushright}\end{minipage}}
+\begin{block}{Temporal Attributes}
+\begin{itemize}
+\item CFL numbers : 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9
+\item First order temporal derivative
+\item First step simulation
+\item Fixed timestep simulation
+\end{itemize}
+\end{block}
+\begin{block}{Spatial Attributes}
+\begin{itemize}
+\item Exponential Profile
+\item 10000 cell spatial grid
+\item Second order spatial derivative
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+ \frametitle{\begin{minipage}{2.2in}Experiments\end{minipage}  \begin{minipage}{2.5in}\begin{flushright}First Step Simulation\end{flushright}\end{minipage}}
+\begin{block}{Description}
+ \begin{itemize}
+  \item The experiment is stopped after the first timestep
+%   \item The final state of the experiment is not comparable
+  \item Does not accumulate error for each timestep
+ \end{itemize}
+\end{block}
+\begin{center}
+\includegraphics[width=80mm]{pics/first_time.pdf}                                                 \end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Explanation} 
+\vspace{-0.1in}
+Continuous solution\\
+\includegraphics[width=25mm]{pics/clarification.pdf}\ \  
+\includegraphics[width=25mm]{pics/continuous1.pdf}\ \ 
+\includegraphics[width=25mm]{pics/continuous5.pdf}\ \ 
+\includegraphics[width=25mm]{pics/continuous9.pdf}\\
+{\tiny\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ T = 0 \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ T = $\Delta$T, CFL = 0.1 \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ T = $\Delta$T, CFL = 0.5 \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ T = $\Delta$T, CFL = 0.9\\}
+Simulated solution\\
+\includegraphics[width=25mm]{pics/clarification.pdf}\ \ 
+\includegraphics[width=25mm]{pics/discontinuous1.pdf}\ \ 
+\includegraphics[width=25mm]{pics/discontinuous5.pdf}\ \ 
+\includegraphics[width=25mm]{pics/discontinuous9.pdf}\\
+{\tiny\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ T = 0 \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ T = $\Delta$T, CFL = 0.1 \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ T = $\Delta$T, CFL = 0.5 \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ T = $\Delta$T, CFL = 0.9\\}
+\pause
+{\scriptsize\ \ \ \ \ \ \ \ \ \ \ \ E = 0 \ \ \ \ \ \ \ \ \ \ \ \ \ \ E = 0.1 + 0.1 = 0.2 \ \ \ \ \ \ E = 0.5 + 0.5 = 1.0 \ \ \ \ E = 0.1 + 0.1 = 0.2}
+\end{frame}
+
+
+
+\begin{frame}
+ \frametitle{\begin{minipage}{1.2in}Experiments\end{minipage}  \begin{minipage}{3.5in}\begin{flushright}Fixed Physical Time Simulation\end{flushright}\end{minipage}}
+\begin{block}{Description}
+ \begin{itemize}
+  \item All experiments were stopped at the same physical time
+%   \item The final state of all the experiments are same
+ \end{itemize}
+\end{block}
+\begin{center}
+\includegraphics[width=80mm]{pics/fixed_time.pdf}                                                 \end{center}
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{\begin{minipage}{2.2in}Experiments\end{minipage}  \begin{minipage}{2.5in}\begin{flushright}Rayleigh Problem\end{flushright}\end{minipage}}
+\begin{center}
+\includegraphics[width=50mm]{pics/rayleigh.pdf}                                                 \end{center}
+\begin{block}{Assumptions}
+\begin{itemize}
+ \item Incompressible
+ \item $\frac{\partial}{\partial x}=\frac{\partial}{\partial z}=0$
+ \item $u_y=0$, $g_y=0$
+\end{itemize}
+\end{block}
+\begin{block}{Governing and Discretized Equation}
+$$\dfrac{\partial \rho u_x}{\partial t}=-\dfrac{\partial \tau_{yz}}{\partial y}$$
+\[\dfrac{\rho u_{x}^{n+1}-\rho u_x^n}{\Delta t} = \mu\left [  \dfrac{u_{x_{j+1}} -2u_{x_{j}}+u_{x_{j-1}}}{\Delta y^2}\right ]\]
+\end{block}
+\end{frame}
+
+\begin{frame}
+ \frametitle{\begin{minipage}{2.2in}Experiments\end{minipage}  \begin{minipage}{2.5in}\begin{flushright}Results and Discussion\end{flushright}\end{minipage}}
+\begin{center}
+\includegraphics[width=80mm]{pics/rayleigh_bug.pdf}\end{center}
+\end{frame}
+
+\begin{frame}
+ \frametitle{\begin{minipage}{2.2in}Experiments\end{minipage}  \begin{minipage}{2.5in}\begin{flushright}Results and Discussion\end{flushright}\end{minipage}}
+\begin{center}
+\includegraphics[width=80mm]{pics/rayleigh_bc.pdf}\end{center}
+\end{frame}
+
+\begin{frame}
+ \frametitle{\begin{minipage}{2.2in}Experiments\end{minipage}  \begin{minipage}{2.5in}\begin{flushright}Results and Discussion\end{flushright}\end{minipage}}
+\begin{center}
+\includegraphics[width=80mm]{pics/rayleigh_fixed.pdf}\end{center}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Results Summary}
+\begin{table}[h]
+\caption{Order-of-Accuracy}
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+&& \\ [-1ex]
+Experiment & Theoretical order & Order-of-Accuracy \\[.25ex]
+%&&\\
+\hline
+& 1st Order  & 0.986 \\[-1ex]
+%\cline{2-3}
+\raisebox{1.5ex}{Exponential 1D} & {2nd Order}  & {1.66} \\[.25ex]
+\hline
+& 1st Order  & 0.734 \\[-1ex]
+%\cline{2-3}
+\raisebox{1.5ex}{Triangular 1D} & {2nd Order} & {0.899} \\[.25ex]
+\hline
+& 1st Order  & 0.9974 \\[-1ex]
+%\cline{2-3}
+\raisebox{1.5ex}{Exponential 2D} & {2nd Order} & {1.883} \\[0.25ex]
+\hline
+Rayleigh & {2nd Order} & {1.9759}\\[0.5ex]
+\hline
+\end{tabular}
+\end{table}
+\end{frame}
+
+% \begin{frame}
+% \frametitle{Future Work}
+% 
+% \end{frame}
+
+\begin{frame}
+\frametitle{Conclusion}
+\begin{itemize}
+\item Verification framework was implemented
+\item MMS experiments were designed for verification
+\item Verification experiments were conducted on the ICE algorithm using the framework
+\item The spatial derivative of the AAT module in the algorithm was verified
+\item Verification framework was used to identify a bug in the diffusion operator in ICE
+\end{itemize}
+\begin{block}{Future Work}
+\begin{itemize}
+ \item More MMS tests for wider code coverage
+\end{itemize}
+		- git config --global user.name "Amjith Ramanujam"
+		- git config --global user.email "amjith.r@gmail.com"
+\end{block}
+
+
+\end{frame}
+
+\end{document}
+

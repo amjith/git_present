@@ -1,0 +1,75 @@
+﻿Getting Started:
+	- http://amjith.com/tmp/cab.tar.gz
+	* Init 
+		- git init 
+		- git add . 
+		- git commit -m "Initial Commit"
+	* Config
+		** email/name
+		- git config --global user.name "Amjith Ramanujam"
+		- git config --global user.email "amjith.r@gmail.com"
+		** gitignore
+		- .gitignore - files to ignore for current repo
+			-- *~
+		- global config
+		- git config --global core.excludefiles "$HOME/.gitignore"
+	* clone 
+		- git clone git://github.com/amjith/Cows_and_Bulls-Game.git
+
+Basic Operations
+	* Make a few changes and checkin.
+	* Explain why it failed.
+		- git status
+	* Staging 
+		- git add 
+		- git ci -a 
+		- interactive add.
+            -- Remove a few lines in 
+	* git diff
+	* git whatchanged
+	* Commit
+	* log
+	* status
+	* git format-patch
+	* git apply 
+	* revert - explain 
+	* git show 
+
+	* aliases
+	- git config --global alias.ci commit
+	- git config --global alias.co checkout
+	- git config --global alias.st status
+	- git config --global alias.br branch
+
+	* Compare with svn : http://git.or.cz/course/svn.html
+        git init == svnadmin create repo
+		git clone == svn checkout
+		git checkout == svn switch
+		git commit  == svn commit
+		git pull  == svn update
+		git push  == svn commit
+		git branch == ??
+		git log  == svn log
+		git tag == svn tag
+
+Distributed version Control
+	* Local Branches
+	- git br levels
+	- make some modifications
+	- git diff master
+	- git co master
+	- git merge levels
+	* Remote Repos
+	- how to share the repo with a friend
+	http://www.kernel.org/pub/software/scm/git/docs/user-manual.html#setting-up-a-public-repository
+		* Bare repo
+		* ssh inside the same server
+		* 
+	* Push/Pull
+	* Central Repo
+
+Advanced Topics
+	* git stash
+	* Workflow - http://nvie.com/posts/a-successful-git-branching-model/
+
+
