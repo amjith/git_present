@@ -1,6 +1,8 @@
 \documentclass[10pt]{beamer}
 %\usepackage{amsmath}
 \usepackage{url}
+\usepackage{listings}
+
 \mode<presentation>
 {
     \usetheme{Warsaw}
@@ -29,9 +31,30 @@
 blog: amjith.blogspot.com}
 
 \date{}
+
+
 \begin{document}
 \begin{frame}
     \titlepage
+\end{frame}
+
+\begin{frame}
+    \frametitle{Why Git?}
+    \begin{block}{Git Features}
+        \begin{itemize}
+            \item Distributed VCS (Local)\\
+            \begin{itemize}
+                \item Fast\\
+                \item Clones are full-backups\\
+                \item Works Offline
+            \end{itemize}
+            \item Efficient Data storage - stores only deltas
+            \item Used by Linux Kernel
+            \item Created by Linus Torvalds
+        \end{itemize}
+    \end{block}
+    \pause
+    Better than sliced bread.
 \end{frame}
 
 \begin{frame}
@@ -42,6 +65,12 @@ blog: amjith.blogspot.com}
             \item git init \\
             \item git add .\\
             \item git commit -m ``Initial Commit.''
+        \end{itemize}
+    \end{block}
+    \pause
+    \begin{block}{Git Cloning}
+        \begin{itemize}
+		\item git clone git://github.com/amjith/Cows\_and\_Bulls-Game.git
         \end{itemize}
     \end{block}
 \end{frame}
@@ -57,17 +86,11 @@ blog: amjith.blogspot.com}
     \pause
     \begin{block}{gitignore}
         \begin{itemize}
-            \item .gitignore\\
+            \item .gitignore\\ 
             \item git config --global core.excludefiles /home/amjith/.gitignore\\
         \end{itemize}
     \end{block}
     \textasciitilde/.gitconfig
-    \pause
-    \begin{block}{Git Cloning}
-        \begin{itemize}
-		\item git clone git://github.com/amjith/Cows\_and\_Bulls-Game.git
-        \end{itemize}
-    \end{block}
 \end{frame}
 
 \begin{frame}
@@ -78,12 +101,13 @@ blog: amjith.blogspot.com}
         \end{itemize}
     \end{block}
     \begin{center}\includegraphics{images/index1.png}\end{center}
-        \begin{block}{Interactive Staging}
-            \begin{itemize}
-                \item Useful for code review.
-                \item Partial checkins. 
-            \end{itemize}
-        \end{block}
+    \pause
+    \begin{block}{Interactive Staging}
+        \begin{itemize}
+            \item Useful for code review.
+            \item Partial checkins. 
+        \end{itemize}
+    \end{block}
 \end{frame}
 
 \begin{frame}
